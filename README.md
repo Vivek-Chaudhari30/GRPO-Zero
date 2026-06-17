@@ -73,7 +73,7 @@ src/train.py      training loop + reward/KL logging + LoRA checkpointing
 src/eval.py       pass@1 / pass@k, base model or trained adapter
 configs/          grpo_gsm8k.yaml
 tests/            verifier + GRPO-math unit tests (model-free)
-notebooks/        colab_train.ipynb (end-to-end on a GPU)
+notebooks/        colab_train.ipynb (end-to-end on a GPU), analysis.ipynb (before/after + curves)
 ```
 
 ## References
