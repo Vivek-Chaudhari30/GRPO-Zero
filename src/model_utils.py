@@ -67,6 +67,22 @@ def load_model_and_tokenizer(model_id: str, *, dtype_name: str = "auto", device=
     return model, tok, device
 
 
+def load_model_with_adapter(model_id: str, adapter_path: str, *, dtype_name: str = "auto",
+                            device=None):
+    """Load the base model with a trained LoRA adapter merged in for inference
+    (used to eval the GRPO-trained policy in M6)."""
+    from peft import PeftModel
+
+    device = device or get_device()
+    dtype = resolve_dtype(dtype_name, device)
+    tok = load_tokenizer(model_id)
+    base = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=dtype)
+    model = PeftModel.from_pretrained(base, adapter_path)
+    model.to(device)
+    model.eval()
+    return model, tok, device
+
+
 def load_policy_for_training(model_id: str, *, lora_cfg: dict, dtype_name: str = "auto",
                              device=None, grad_checkpoint: bool = False):
     """Load the policy as a LoRA/PEFT model. The frozen *reference* is the same

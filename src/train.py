@@ -55,6 +55,8 @@ def main():
     ap.add_argument("--max-new-tokens", type=int, default=None)
     ap.add_argument("--lr", type=float, default=None)
     ap.add_argument("--log", default=os.path.join(RESULTS_DIR, "train_log.json"))
+    ap.add_argument("--save-dir", default="checkpoints/grpo_lora",
+                    help="where to save the trained LoRA adapter")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -108,7 +110,14 @@ def main():
         with open(args.log, "w") as f:
             json.dump(history, f, indent=2)
 
+        # periodic checkpoint so a long run survives a disconnect
+        if tcfg.get("eval_every") and (step + 1) % tcfg["eval_every"] == 0:
+            model.save_pretrained(args.save_dir)
+            print(f"  (checkpoint -> {args.save_dir})", flush=True)
+
+    model.save_pretrained(args.save_dir)
     print(f"\nDone. {steps} steps in {time.time()-t0:.0f}s. Log -> {args.log}")
+    print(f"Adapter saved -> {args.save_dir}")
     if history:
         first = sum(h["reward_mean"] for h in history[:3]) / min(3, len(history))
         last = sum(h["reward_mean"] for h in history[-3:]) / min(3, len(history))

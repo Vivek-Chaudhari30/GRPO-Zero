@@ -17,7 +17,7 @@ import time
 import torch
 
 from .data import load_gsm8k, render_prompt
-from .model_utils import load_config, load_model_and_tokenizer
+from .model_utils import load_config, load_model_and_tokenizer, load_model_with_adapter
 from .verifier import score_completion
 
 RESULTS_DIR = "results"
@@ -99,6 +99,8 @@ def main():
     ap.add_argument("--n", type=int, default=None, help="override eval.n")
     ap.add_argument("--pass-k", type=int, default=None, help="override eval.pass_k")
     ap.add_argument("--model", default=None, help="override model.id")
+    ap.add_argument("--adapter", default=None,
+                    help="path to a trained LoRA adapter to eval (the GRPO policy)")
     ap.add_argument("--tag", default="baseline", help="key under which to save the metric")
     ap.add_argument("--save-completions", default=None,
                     help="optional path to dump per-example completions as JSON")
@@ -112,9 +114,14 @@ def main():
 
     torch.manual_seed(ecfg.get("seed", 0))
 
-    print(f"Loading {model_id} ...", flush=True)
-    model, tokenizer, device = load_model_and_tokenizer(
-        model_id, dtype_name=cfg["model"].get("dtype", "auto"))
+    dtype_name = cfg["model"].get("dtype", "auto")
+    if args.adapter:
+        print(f"Loading {model_id} + adapter {args.adapter} ...", flush=True)
+        model, tokenizer, device = load_model_with_adapter(
+            model_id, args.adapter, dtype_name=dtype_name)
+    else:
+        print(f"Loading {model_id} ...", flush=True)
+        model, tokenizer, device = load_model_and_tokenizer(model_id, dtype_name=dtype_name)
     print(f"Device: {device}, dtype: {next(model.parameters()).dtype}", flush=True)
 
     records = load_gsm8k(ecfg["split"], n=n)
@@ -130,6 +137,7 @@ def main():
     metric = f"pass@{k}"
     payload = {
         "model": model_id,
+        "adapter": args.adapter,
         "split": ecfg["split"],
         "n": len(records),
         "metric": metric,
