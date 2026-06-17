@@ -1,0 +1,21 @@
+# GRPO-Zero config. Everything device/model-specific lives here so the same
+# code runs on the Mac (MPS) for dev and a CUDA box for training.
+
+model:
+  # 0.5B to validate the loop cheaply; bump to Qwen2.5-1.5B-Instruct (or 3B) on a
+  # bigger GPU. The baseline eval and the trained policy must use the SAME id to
+  # be a fair comparison.
+  id: Qwen/Qwen2.5-0.5B-Instruct
+  dtype: auto          # auto -> bf16 (cuda) / fp16 (mps) / fp32 (cpu)
+
+eval:
+  split: test
+  n: 100               # # of test problems; null = full (~1319). Subset on Mac, full on GPU.
+  batch_size: 8
+  max_new_tokens: 512
+  pass_k: 1            # 1 -> greedy pass@1 (the headline baseline). >1 -> sampled pass@k.
+  temperature: 0.8     # only used when pass_k > 1
+  top_p: 0.95          # only used when pass_k > 1
+  seed: 0
+
+# training: ... (added in milestones 4-5)

@@ -1,0 +1,12 @@
+{
+  "baseline": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "split": "test",
+    "n": 100,
+    "metric": "pass@1",
+    "accuracy": 0.47,
+    "max_new_tokens": 512,
+    "device": "mps",
+    "full_test_set": false
+  }
+}
