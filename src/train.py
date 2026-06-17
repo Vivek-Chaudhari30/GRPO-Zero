@@ -54,6 +54,8 @@ def main():
     ap.add_argument("--prompts-per-step", type=int, default=None)
     ap.add_argument("--max-new-tokens", type=int, default=None)
     ap.add_argument("--lr", type=float, default=None)
+    ap.add_argument("--micro-batch", type=int, default=None,
+                    help="override train.micro_batch (lower if you hit CUDA OOM)")
     ap.add_argument("--log", default=os.path.join(RESULTS_DIR, "train_log.json"))
     ap.add_argument("--save-dir", default="checkpoints/grpo_lora",
                     help="where to save the trained LoRA adapter")
@@ -67,6 +69,7 @@ def main():
     if args.max_new_tokens:   rcfg["max_new_tokens"] = args.max_new_tokens
     if args.prompts_per_step: tcfg["prompts_per_step"] = args.prompts_per_step
     if args.lr:               tcfg["lr"] = args.lr
+    if args.micro_batch:      tcfg["micro_batch"] = args.micro_batch
     steps = args.steps if args.steps is not None else tcfg["steps"]
 
     set_seed(tcfg["seed"])

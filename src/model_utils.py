@@ -94,10 +94,8 @@ def load_policy_for_training(model_id: str, *, lora_cfg: dict, dtype_name: str =
     dtype = resolve_dtype(dtype_name, device)
     tok = load_tokenizer(model_id)
     model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=dtype)
-
-    if grad_checkpoint:
-        model.gradient_checkpointing_enable()
-    # generation passes use_cache=True explicitly; keep it off for the grad forwards.
+    # generation passes use_cache=True explicitly; keep the cache off for the grad
+    # forwards (also required for gradient checkpointing).
     model.config.use_cache = False
 
     peft_cfg = LoraConfig(
@@ -105,5 +103,14 @@ def load_policy_for_training(model_id: str, *, lora_cfg: dict, dtype_name: str =
         target_modules=lora_cfg["target_modules"], task_type="CAUSAL_LM",
     )
     model = get_peft_model(model, peft_cfg)
+
+    if grad_checkpoint:
+        # Recompute layer activations in the backward instead of storing them all
+        # — the single biggest memory lever here (attention activations grow with
+        # seq_len^2 across every layer). With a frozen base + LoRA, the inputs must
+        # require grad so the recomputed graph reconnects through the adapter.
+        model.enable_input_require_grads()
+        model.gradient_checkpointing_enable()
+
     model.to(device)
     return model, tok, device

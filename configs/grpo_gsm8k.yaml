@@ -33,7 +33,7 @@ train:
   adv_eps: 1.0e-4      # epsilon in advantage normalization (guards std=0 groups)
   steps: 200
   prompts_per_step: 8  # distinct prompts rolled out per step (x group_size completions)
-  micro_batch: 4       # sequences per forward/backward chunk (memory lever)
+  micro_batch: 2       # sequences per forward/backward chunk (memory lever; lower if OOM)
   eval_every: 25       # run a small eval + checkpoint every N steps
   seed: 0
   lora:
@@ -41,4 +41,4 @@ train:
     alpha: 32
     dropout: 0.05
     target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
-  grad_checkpoint: false   # enable on the CUDA box to save memory
+  grad_checkpoint: true    # recompute activations in backward (essential on a 16GB GPU)
