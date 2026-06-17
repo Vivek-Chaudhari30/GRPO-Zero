@@ -1,0 +1,19 @@
+# Core (runs on Mac/MPS for dev + CUDA for training)
+torch>=2.2
+transformers>=4.45
+datasets>=2.20
+accelerate>=0.34
+peft>=0.12          # LoRA for the policy (memory lever, used in training milestones)
+
+# Reference / cross-check only — we implement the GRPO update ourselves; TRL's
+# GRPOTrainer is used solely to sanity-check our advantage/loss math, never as the trainer.
+trl>=0.11
+
+# Config, plotting, tests
+pyyaml>=6.0
+matplotlib>=3.7
+numpy>=1.24
+pytest>=8.0
+
+# Optional GPU-only extra (NOT required; do not install on macOS):
+#   vllm>=0.6   # fast batched rollouts; enable via config when on a CUDA box

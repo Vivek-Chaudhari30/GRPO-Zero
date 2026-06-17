@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+.venv/
+venv/
+
+# Data / model caches
+.cache/
+data/
+*.safetensors
+*.bin
+
+# Training artifacts (keep results/ committed deliberately, ignore checkpoints)
+checkpoints/
+outputs/
+wandb/
+*.pt
