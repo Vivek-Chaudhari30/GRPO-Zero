@@ -18,4 +18,10 @@ eval:
   top_p: 0.95          # only used when pass_k > 1
   seed: 0
 
+rollout:
+  group_size: 8        # G: completions sampled per prompt (the GRPO "group")
+  max_new_tokens: 512
+  temperature: 1.0     # high temp -> diverse group (DeepSeek uses ~1.0 for rollouts)
+  top_p: 1.0
+
 # training: ... (added in milestones 4-5)
