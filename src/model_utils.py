@@ -65,3 +65,29 @@ def load_model_and_tokenizer(model_id: str, *, dtype_name: str = "auto", device=
     model.to(device)
     model.eval()
     return model, tok, device
+
+
+def load_policy_for_training(model_id: str, *, lora_cfg: dict, dtype_name: str = "auto",
+                             device=None, grad_checkpoint: bool = False):
+    """Load the policy as a LoRA/PEFT model. The frozen *reference* is the same
+    object with the adapter disabled (see grpo.batched_logprobs) — so we keep one
+    copy of the base weights plus a small trainable adapter, not two full models."""
+    from peft import LoraConfig, get_peft_model
+
+    device = device or get_device()
+    dtype = resolve_dtype(dtype_name, device)
+    tok = load_tokenizer(model_id)
+    model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=dtype)
+
+    if grad_checkpoint:
+        model.gradient_checkpointing_enable()
+    # generation passes use_cache=True explicitly; keep it off for the grad forwards.
+    model.config.use_cache = False
+
+    peft_cfg = LoraConfig(
+        r=lora_cfg["r"], lora_alpha=lora_cfg["alpha"], lora_dropout=lora_cfg["dropout"],
+        target_modules=lora_cfg["target_modules"], task_type="CAUSAL_LM",
+    )
+    model = get_peft_model(model, peft_cfg)
+    model.to(device)
+    return model, tok, device

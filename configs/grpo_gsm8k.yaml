@@ -24,4 +24,21 @@ rollout:
   temperature: 1.0     # high temp -> diverse group (DeepSeek uses ~1.0 for rollouts)
   top_p: 1.0
 
-# training: ... (added in milestones 4-5)
+train:
+  lr: 1.0e-6           # GRPO is sensitive; 1e-6 for the real run (raise for tiny overfit demos)
+  kl_coef: 0.04        # beta: KL penalty to the frozen reference
+  clip_eps: 0.2        # PPO trust-region clip
+  ppo_epochs: 1        # reuse each rollout this many times (1 = on-policy)
+  grad_clip: 1.0
+  adv_eps: 1.0e-4      # epsilon in advantage normalization (guards std=0 groups)
+  steps: 200
+  prompts_per_step: 8  # distinct prompts rolled out per step (x group_size completions)
+  micro_batch: 4       # sequences per forward/backward chunk (memory lever)
+  eval_every: 25       # run a small eval + checkpoint every N steps
+  seed: 0
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.05
+    target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+  grad_checkpoint: false   # enable on the CUDA box to save memory
