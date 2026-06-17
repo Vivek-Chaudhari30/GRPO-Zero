@@ -34,7 +34,7 @@ train:
   steps: 200
   prompts_per_step: 8  # distinct prompts rolled out per step (x group_size completions)
   micro_batch: 2       # sequences per forward/backward chunk (memory lever; lower if OOM)
-  eval_every: 25       # run a small eval + checkpoint every N steps
+  eval_every: 10       # checkpoint every N steps (resumable; survives GPU-quota disconnects)
   seed: 0
   lora:
     r: 16

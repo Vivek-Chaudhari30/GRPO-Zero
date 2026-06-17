@@ -25,12 +25,43 @@ from .grpo import train_step
 from .model_utils import get_device, load_config, load_policy_for_training
 
 RESULTS_DIR = "results"
+STATE_FILE = "training_state.pt"   # optimizer + step + history, for --resume
 
 
 def set_seed(seed: int):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def save_checkpoint(save_dir, model, optimizer, step, history):
+    """Save the LoRA adapter (for eval) plus resumable training state so a run
+    interrupted by a GPU-quota disconnect can pick up where it left off."""
+    from peft import get_peft_model_state_dict
+
+    os.makedirs(save_dir, exist_ok=True)
+    model.save_pretrained(save_dir)  # adapter_model.safetensors — used by eval --adapter
+    torch.save(
+        {"step": step, "model": get_peft_model_state_dict(model),
+         "optimizer": optimizer.state_dict(), "history": history},
+        os.path.join(save_dir, STATE_FILE),
+    )
+
+
+def maybe_resume(save_dir, model, optimizer, device):
+    """If a training_state.pt exists in save_dir, restore adapter + optimizer +
+    history and return (start_step, history). Otherwise start fresh."""
+    from peft import set_peft_model_state_dict
+
+    path = os.path.join(save_dir, STATE_FILE)
+    if not os.path.exists(path):
+        return 0, []
+    ckpt = torch.load(path, map_location=device, weights_only=False)
+    set_peft_model_state_dict(model, ckpt["model"])
+    optimizer.load_state_dict(ckpt["optimizer"])
+    start = ckpt["step"] + 1
+    print(f"Resuming from {path}: continuing at step {start}")
+    return start, ckpt["history"]
 
 
 def get_prompt_batch(pool, step, prompts_per_step, overfit):
@@ -59,6 +90,8 @@ def main():
     ap.add_argument("--log", default=os.path.join(RESULTS_DIR, "train_log.json"))
     ap.add_argument("--save-dir", default="checkpoints/grpo_lora",
                     help="where to save the trained LoRA adapter")
+    ap.add_argument("--resume", action="store_true",
+                    help="resume from save_dir/training_state.pt if present")
     args = ap.parse_args()
 
     cfg = load_config(args.config)
@@ -90,13 +123,15 @@ def main():
     optimizer = torch.optim.AdamW(
         (p for p in model.parameters() if p.requires_grad), lr=tcfg["lr"])
 
+    start_step, history = (maybe_resume(args.save_dir, model, optimizer, device)
+                           if args.resume else (0, []))
+
     n_pool = args.overfit if args.overfit else max(steps * tcfg["prompts_per_step"], 256)
     pool = load_gsm8k("train", n=n_pool)
     print(f"Prompt pool: {len(pool)} problems\n")
 
-    history = []
     t0 = time.time()
-    for step in range(steps):
+    for step in range(start_step, steps):
         records = get_prompt_batch(pool, step, tcfg["prompts_per_step"], args.overfit)
         m = train_step(model, tokenizer, records, optimizer,
                        rollout_cfg=rcfg, train_cfg=tcfg, device=device)
@@ -113,12 +148,12 @@ def main():
         with open(args.log, "w") as f:
             json.dump(history, f, indent=2)
 
-        # periodic checkpoint so a long run survives a disconnect
+        # periodic checkpoint so a long run survives a GPU-quota disconnect (resume with --resume)
         if tcfg.get("eval_every") and (step + 1) % tcfg["eval_every"] == 0:
-            model.save_pretrained(args.save_dir)
+            save_checkpoint(args.save_dir, model, optimizer, step, history)
             print(f"  (checkpoint -> {args.save_dir})", flush=True)
 
-    model.save_pretrained(args.save_dir)
+    save_checkpoint(args.save_dir, model, optimizer, steps - 1, history)
     print(f"\nDone. {steps} steps in {time.time()-t0:.0f}s. Log -> {args.log}")
     print(f"Adapter saved -> {args.save_dir}")
     if history:
