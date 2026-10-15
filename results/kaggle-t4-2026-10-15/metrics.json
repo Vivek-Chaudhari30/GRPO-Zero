@@ -1,0 +1,24 @@
+{
+  "baseline_full": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "adapter": null,
+    "split": "test",
+    "n": 1319,
+    "metric": "pass@1",
+    "accuracy": 0.4397,
+    "max_new_tokens": 512,
+    "device": "cuda",
+    "full_test_set": true
+  },
+  "trained_full": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "adapter": "checkpoints/grpo_lora",
+    "split": "test",
+    "n": 1319,
+    "metric": "pass@1",
+    "accuracy": 0.4329,
+    "max_new_tokens": 512,
+    "device": "cuda",
+    "full_test_set": true
+  }
+}

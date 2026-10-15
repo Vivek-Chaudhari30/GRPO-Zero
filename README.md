@@ -45,8 +45,14 @@ The format bonus is independent of correctness, so it shapes output style withou
 | | model | metric | n | accuracy |
 |---|---|---|---|---|
 | **Baseline** (no training) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 100 (test subset, MPS) | **0.47** |
-| Baseline (full set) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 1319 (GPU) | _pending full GPU run_ |
-| **GRPO-trained** | + LoRA adapter | pass@1 (greedy) | 1319 (GPU) | _pending full GPU run_ |
+| Baseline (full set) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 1319 (Kaggle T4) | **0.4397** (580/1319) |
+| **GRPO-trained** | + LoRA adapter, **70 of 200 planned steps** | pass@1 (greedy) | 1319 (Kaggle T4) | **0.4329** (571/1319) |
+
+**Honest read:** on the full test set the trained adapter is 0.0068 *below* the baseline (-9 problems), i.e. no measurable improvement. Training hit a 4.5 h cap on the T4 (bf16 emulated, ~215 s/step) at 70 of 200 steps, mean reward only rose 0.300 -> 0.324, so this run is too short to confirm or refute the GRPO gain. Details, GPU/torch versions and logs: [`results/kaggle-t4-2026-10-15/`](results/kaggle-t4-2026-10-15/README.md). The 0.47 above is a 100-problem MPS subset and is not comparable to the full-set numbers.
+
+![reward curve](results/kaggle-t4-2026-10-15/reward_curve.png)
+
+Sample before/after (GSM8K test problem 23, gold 8): baseline answered 7 (subtracted 1 cm after mis-setting the problem), trained answered 8 via `4 h x 2 cm/h`. Problem 29 (gold 104): baseline 71, trained 104. The trained model also got 99 problems wrong that the baseline had right, so these are cherry-picked fixes, not a trend.
 
 The full-test-set baseline and trained numbers, the reward curve, and before/after sample completions are produced by the Colab run below and filled in here with the **real measured values** — no placeholders.
 
