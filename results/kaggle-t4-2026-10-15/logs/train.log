@@ -1,0 +1,91 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Device: cuda | model: Qwen/Qwen2.5-0.5B-Instruct
+G=8 prompts/step=8 max_new_tokens=512 lr=1e-06 kl_coef=0.04 steps=200
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  86%|████████▌ | 248/290 [00:00<00:00, 2470.10it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 2513.79it/s]
+LoRA trainable params: 8,798,208 / 502,830,976 (1.75%)
+Prompt pool: 1600 problems
+
+step   0 | reward 0.319 (correct 0.25) | loss +0.0000 | KL 0.0000 | clip 0.00 | |g| 0.59 | len 298 | 217s
+step   1 | reward 0.280 (correct 0.22) | loss +0.0078 | KL 0.0010 | clip 0.01 | |g| 6.11 | len 319 | 434s
+step   2 | reward 0.195 (correct 0.12) | loss +0.0003 | KL 0.0010 | clip 0.01 | |g| 0.38 | len 355 | 643s
+step   3 | reward 0.339 (correct 0.28) | loss +0.0002 | KL 0.0009 | clip 0.01 | |g| 0.30 | len 336 | 854s
+step   4 | reward 0.459 (correct 0.39) | loss +0.0000 | KL 0.0009 | clip 0.01 | |g| 0.33 | len 300 | 1074s
+step   5 | reward 0.286 (correct 0.22) | loss -0.0011 | KL 0.0009 | clip 0.01 | |g| 1.59 | len 307 | 1282s
+step   6 | reward 0.398 (correct 0.33) | loss -0.0005 | KL 0.0009 | clip 0.01 | |g| 2.75 | len 301 | 1490s
+step   7 | reward 0.111 (correct 0.05) | loss +0.0008 | KL 0.0011 | clip 0.01 | |g| 3.68 | len 354 | 1704s
+step   8 | reward 0.280 (correct 0.22) | loss +0.0010 | KL 0.0010 | clip 0.01 | |g| 0.74 | len 304 | 1912s
+step   9 | reward 0.334 (correct 0.27) | loss +0.0007 | KL 0.0010 | clip 0.01 | |g| 0.78 | len 262 | 2121s
+  (checkpoint -> checkpoints/grpo_lora)
+step  10 | reward 0.236 (correct 0.17) | loss -0.0002 | KL 0.0010 | clip 0.00 | |g| 0.54 | len 344 | 2336s
+step  11 | reward 0.294 (correct 0.23) | loss +0.0007 | KL 0.0010 | clip 0.01 | |g| 0.42 | len 338 | 2543s
+step  12 | reward 0.214 (correct 0.16) | loss -0.0005 | KL 0.0010 | clip 0.01 | |g| 1.19 | len 335 | 2760s
+step  13 | reward 0.361 (correct 0.30) | loss +0.0007 | KL 0.0009 | clip 0.01 | |g| 0.33 | len 294 | 2971s
+step  14 | reward 0.252 (correct 0.19) | loss -0.0011 | KL 0.0009 | clip 0.00 | |g| 1.34 | len 338 | 3184s
+step  15 | reward 0.348 (correct 0.28) | loss -0.0003 | KL 0.0009 | clip 0.01 | |g| 0.38 | len 314 | 3392s
+step  16 | reward 0.341 (correct 0.27) | loss +0.0001 | KL 0.0010 | clip 0.01 | |g| 0.32 | len 307 | 3604s
+step  17 | reward 0.119 (correct 0.06) | loss -0.0000 | KL 0.0010 | clip 0.01 | |g| 0.28 | len 351 | 3813s
+step  18 | reward 0.406 (correct 0.33) | loss +0.0006 | KL 0.0009 | clip 0.01 | |g| 0.55 | len 272 | 4025s
+step  19 | reward 0.303 (correct 0.23) | loss +0.0025 | KL 0.0010 | clip 0.00 | |g| 3.16 | len 305 | 4226s
+  (checkpoint -> checkpoints/grpo_lora)
+step  20 | reward 0.111 (correct 0.05) | loss +0.0001 | KL 0.0009 | clip 0.01 | |g| 0.29 | len 364 | 4439s
+step  21 | reward 0.289 (correct 0.23) | loss -0.0001 | KL 0.0009 | clip 0.01 | |g| 0.30 | len 342 | 4668s
+step  22 | reward 0.233 (correct 0.17) | loss +0.0002 | KL 0.0008 | clip 0.00 | |g| 0.58 | len 356 | 4880s
+step  23 | reward 0.364 (correct 0.30) | loss +0.0012 | KL 0.0010 | clip 0.01 | |g| 1.49 | len 284 | 5090s
+step  24 | reward 0.253 (correct 0.19) | loss +0.0019 | KL 0.0010 | clip 0.01 | |g| 1.73 | len 332 | 5297s
+step  25 | reward 0.328 (correct 0.25) | loss -0.0003 | KL 0.0010 | clip 0.01 | |g| 0.39 | len 291 | 5504s
+step  26 | reward 0.220 (correct 0.16) | loss -0.0004 | KL 0.0009 | clip 0.01 | |g| 0.31 | len 325 | 5717s
+step  27 | reward 0.227 (correct 0.17) | loss +0.0002 | KL 0.0010 | clip 0.01 | |g| 0.28 | len 366 | 5930s
+step  28 | reward 0.125 (correct 0.06) | loss +0.0017 | KL 0.0011 | clip 0.01 | |g| 1.10 | len 341 | 6143s
+step  29 | reward 0.263 (correct 0.19) | loss -0.0004 | KL 0.0010 | clip 0.01 | |g| 0.61 | len 343 | 6363s
+  (checkpoint -> checkpoints/grpo_lora)
+step  30 | reward 0.430 (correct 0.38) | loss +0.0012 | KL 0.0009 | clip 0.01 | |g| 1.33 | len 342 | 6576s
+step  31 | reward 0.373 (correct 0.31) | loss +0.0001 | KL 0.0009 | clip 0.01 | |g| 0.87 | len 323 | 6786s
+step  32 | reward 0.322 (correct 0.25) | loss -0.0000 | KL 0.0009 | clip 0.01 | |g| 0.38 | len 341 | 6986s
+step  33 | reward 0.186 (correct 0.12) | loss +0.0006 | KL 0.0010 | clip 0.01 | |g| 0.32 | len 343 | 7200s
+step  34 | reward 0.381 (correct 0.31) | loss -0.0006 | KL 0.0008 | clip 0.00 | |g| 1.08 | len 334 | 7406s
+step  35 | reward 0.244 (correct 0.19) | loss +0.0005 | KL 0.0010 | clip 0.01 | |g| 0.38 | len 305 | 7606s
+step  36 | reward 0.295 (correct 0.23) | loss +0.0008 | KL 0.0009 | clip 0.01 | |g| 1.02 | len 323 | 7818s
+step  37 | reward 0.219 (correct 0.16) | loss -0.0003 | KL 0.0010 | clip 0.01 | |g| 0.86 | len 371 | 8029s
+step  38 | reward 0.333 (correct 0.28) | loss +0.0007 | KL 0.0012 | clip 0.01 | |g| 2.29 | len 349 | 8250s
+step  39 | reward 0.297 (correct 0.23) | loss +0.0010 | KL 0.0010 | clip 0.01 | |g| 0.82 | len 345 | 8462s
+  (checkpoint -> checkpoints/grpo_lora)
+step  40 | reward 0.294 (correct 0.23) | loss +0.0000 | KL 0.0009 | clip 0.01 | |g| 0.36 | len 306 | 8674s
+step  41 | reward 0.234 (correct 0.17) | loss +0.0005 | KL 0.0010 | clip 0.01 | |g| 0.32 | len 359 | 8893s
+step  42 | reward 0.238 (correct 0.17) | loss +0.0003 | KL 0.0010 | clip 0.01 | |g| 0.28 | len 342 | 9109s
+step  43 | reward 0.353 (correct 0.28) | loss -0.0007 | KL 0.0011 | clip 0.01 | |g| 1.27 | len 269 | 9319s
+step  44 | reward 0.317 (correct 0.25) | loss -0.0001 | KL 0.0010 | clip 0.01 | |g| 2.52 | len 316 | 9540s
+step  45 | reward 0.267 (correct 0.22) | loss +0.0002 | KL 0.0009 | clip 0.01 | |g| 0.54 | len 360 | 9763s
+step  46 | reward 0.344 (correct 0.28) | loss +0.0005 | KL 0.0010 | clip 0.01 | |g| 0.39 | len 295 | 9975s
+step  47 | reward 0.405 (correct 0.33) | loss -0.0002 | KL 0.0010 | clip 0.01 | |g| 1.46 | len 264 | 10175s
+step  48 | reward 0.281 (correct 0.22) | loss +0.0002 | KL 0.0010 | clip 0.01 | |g| 0.45 | len 314 | 10395s
+step  49 | reward 0.364 (correct 0.30) | loss -0.0000 | KL 0.0010 | clip 0.01 | |g| 0.86 | len 328 | 10635s
+  (checkpoint -> checkpoints/grpo_lora)
+step  50 | reward 0.203 (correct 0.14) | loss -0.0002 | KL 0.0011 | clip 0.00 | |g| 0.26 | len 392 | 10848s
+step  51 | reward 0.188 (correct 0.12) | loss +0.0003 | KL 0.0011 | clip 0.01 | |g| 0.31 | len 345 | 11061s
+step  52 | reward 0.570 (correct 0.50) | loss +0.0001 | KL 0.0009 | clip 0.01 | |g| 0.38 | len 251 | 11261s
+step  53 | reward 0.147 (correct 0.08) | loss -0.0004 | KL 0.0011 | clip 0.01 | |g| 7.82 | len 338 | 11481s
+step  54 | reward 0.258 (correct 0.20) | loss -0.0006 | KL 0.0016 | clip 0.01 | |g| 0.50 | len 317 | 11692s
+step  55 | reward 0.402 (correct 0.33) | loss +0.0003 | KL 0.0009 | clip 0.01 | |g| 0.30 | len 308 | 11910s
+step  56 | reward 0.338 (correct 0.28) | loss -0.0004 | KL 0.0011 | clip 0.01 | |g| 0.49 | len 304 | 12118s
+step  57 | reward 0.133 (correct 0.08) | loss +0.0022 | KL 0.0011 | clip 0.01 | |g| 3.07 | len 360 | 12328s
+step  58 | reward 0.183 (correct 0.12) | loss -0.0002 | KL 0.0011 | clip 0.01 | |g| 0.37 | len 356 | 12541s
+step  59 | reward 0.378 (correct 0.31) | loss +0.0007 | KL 0.0011 | clip 0.01 | |g| 0.68 | len 295 | 12750s
+  (checkpoint -> checkpoints/grpo_lora)
+step  60 | reward 0.203 (correct 0.14) | loss +0.0004 | KL 0.0011 | clip 0.01 | |g| 0.33 | len 321 | 12960s
+step  61 | reward 0.330 (correct 0.27) | loss -0.0000 | KL 0.0010 | clip 0.01 | |g| 0.65 | len 302 | 13169s
+step  62 | reward 0.314 (correct 0.25) | loss +0.0001 | KL 0.0012 | clip 0.01 | |g| 0.69 | len 325 | 13391s
+step  63 | reward 0.378 (correct 0.31) | loss +0.0002 | KL 0.0010 | clip 0.01 | |g| 1.66 | len 299 | 13601s
+step  64 | reward 0.353 (correct 0.30) | loss +0.0015 | KL 0.0013 | clip 0.01 | |g| 3.83 | len 267 | 13812s
+step  65 | reward 0.347 (correct 0.28) | loss +0.0000 | KL 0.0011 | clip 0.01 | |g| 1.04 | len 291 | 14026s
+step  66 | reward 0.428 (correct 0.36) | loss -0.0003 | KL 0.0010 | clip 0.01 | |g| 0.37 | len 277 | 14232s
+step  67 | reward 0.342 (correct 0.27) | loss +0.0001 | KL 0.0010 | clip 0.01 | |g| 0.33 | len 307 | 14438s
+step  68 | reward 0.363 (correct 0.30) | loss +0.0004 | KL 0.0011 | clip 0.01 | |g| 0.38 | len 324 | 14638s
+step  69 | reward 0.292 (correct 0.22) | loss -0.0002 | KL 0.0010 | clip 0.01 | |g| 0.28 | len 345 | 14848s
+  (checkpoint -> checkpoints/grpo_lora)
+step  70 | reward 0.286 (correct 0.22) | loss +0.0008 | KL 0.0011 | clip 0.01 | |g| 0.34 | len 323 | 15068s
+step  71 | reward 0.322 (correct 0.27) | loss +0.0017 | KL 0.0012 | clip 0.01 | |g| 4.71 | len 288 | 15278s
+step  72 | reward 0.298 (correct 0.23) | loss +0.0001 | KL 0.0010 | clip 0.01 | |g| 0.32 | len 316 | 15494s
+step  73 | reward 0.330 (correct 0.27) | loss +0.0002 | KL 0.0011 | clip 0.01 | |g| 0.48 | len 273 | 15694s
+step  74 | reward 0.258 (correct 0.19) | loss +0.0000 | KL 0.0011 | clip 0.01 | |g| 0.26 | len 330 | 15917s
+step  75 | reward 0.325 (correct 0.27) | loss +0.0004 | KL 0.0011 | clip 0.01 | |g| 0.32 | len 342 | 16131s

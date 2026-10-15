@@ -1,0 +1,47 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Device: cuda | model: Qwen/Qwen2.5-0.5B-Instruct
+G=8 prompts/step=8 max_new_tokens=512 lr=5e-05 kl_coef=0.04 steps=30 | OVERFIT n=16
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  84%|████████▍ | 245/290 [00:00<00:00, 2437.10it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 2503.13it/s]
+LoRA trainable params: 8,798,208 / 502,830,976 (1.75%)
+Generating train split:   0%|          | 0/7473 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 7473/7473 [00:00<00:00, 80293.76 examples/s]
+Generating test split:   0%|          | 0/1319 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 1319/1319 [00:00<00:00, 314584.73 examples/s]
+Prompt pool: 16 problems
+
+step   0 | reward 0.319 (correct 0.25) | loss +0.0000 | KL 0.0000 | clip 0.00 | |g| 0.59 | len 298 | 214s
+step   1 | reward 0.205 (correct 0.16) | loss -0.0000 | KL 0.0015 | clip 0.01 | |g| 0.32 | len 364 | 431s
+step   2 | reward 0.458 (correct 0.38) | loss -0.0001 | KL 0.0044 | clip 0.01 | |g| 1.39 | len 269 | 648s
+step   3 | reward 0.267 (correct 0.20) | loss +0.0011 | KL 0.0073 | clip 0.01 | |g| 1.58 | len 348 | 865s
+step   4 | reward 0.445 (correct 0.36) | loss +0.0018 | KL 0.0191 | clip 0.01 | |g| 1.95 | len 248 | 1082s
+step   5 | reward 0.334 (correct 0.27) | loss +0.0010 | KL 0.0178 | clip 0.01 | |g| 0.35 | len 322 | 1299s
+step   6 | reward 0.395 (correct 0.31) | loss +0.0104 | KL 0.1915 | clip 0.01 | |g| 2.57 | len 178 | 1515s
+step   7 | reward 0.278 (correct 0.20) | loss +0.0104 | KL 0.1007 | clip 0.01 | |g| 2.88 | len 296 | 1732s
+step   8 | reward 0.350 (correct 0.27) | loss +0.0113 | KL 0.0997 | clip 0.01 | |g| 1.44 | len 189 | 1948s
+step   9 | reward 0.345 (correct 0.27) | loss +0.0062 | KL 0.0747 | clip 0.01 | |g| 0.94 | len 263 | 2165s
+  (checkpoint -> checkpoints/overfit)
+step  10 | reward 0.378 (correct 0.30) | loss +0.0461 | KL 1.3759 | clip 0.01 | |g| 11.61 | len 188 | 2373s
+step  11 | reward 0.309 (correct 0.23) | loss +0.0038 | KL 0.0343 | clip 0.01 | |g| 1.06 | len 337 | 2590s
+step  12 | reward 0.500 (correct 0.42) | loss +0.0035 | KL 0.0624 | clip 0.01 | |g| 0.91 | len 223 | 2807s
+step  13 | reward 0.348 (correct 0.28) | loss +0.0014 | KL 0.0620 | clip 0.01 | |g| 1.16 | len 300 | 3024s
+step  14 | reward 0.452 (correct 0.38) | loss +0.0038 | KL 0.0487 | clip 0.01 | |g| 0.57 | len 263 | 3240s
+step  15 | reward 0.355 (correct 0.28) | loss +0.0048 | KL 0.0745 | clip 0.01 | |g| 0.72 | len 290 | 3458s
+step  16 | reward 0.403 (correct 0.33) | loss +0.0027 | KL 0.0517 | clip 0.01 | |g| 0.46 | len 258 | 3674s
+step  17 | reward 0.303 (correct 0.23) | loss +0.0027 | KL 0.0395 | clip 0.01 | |g| 0.35 | len 341 | 3892s
+step  18 | reward 0.478 (correct 0.39) | loss +0.0042 | KL 0.0544 | clip 0.01 | |g| 0.41 | len 259 | 4108s
+step  19 | reward 0.366 (correct 0.30) | loss +0.0034 | KL 0.0392 | clip 0.01 | |g| 0.44 | len 326 | 4325s
+  (checkpoint -> checkpoints/overfit)
+step  20 | reward 0.506 (correct 0.42) | loss +0.0046 | KL 0.0717 | clip 0.01 | |g| 0.51 | len 247 | 4542s
+step  21 | reward 0.312 (correct 0.23) | loss +0.0027 | KL 0.0482 | clip 0.01 | |g| 0.44 | len 347 | 4759s
+step  22 | reward 0.473 (correct 0.39) | loss +0.0051 | KL 0.0547 | clip 0.01 | |g| 0.57 | len 237 | 4976s
+step  23 | reward 0.294 (correct 0.22) | loss +0.0019 | KL 0.0403 | clip 0.01 | |g| 0.29 | len 348 | 5193s
+step  24 | reward 0.498 (correct 0.41) | loss +0.0025 | KL 0.0403 | clip 0.01 | |g| 0.37 | len 260 | 5410s
+step  25 | reward 0.294 (correct 0.23) | loss +0.0025 | KL 0.0601 | clip 0.01 | |g| 0.51 | len 359 | 5628s
+step  26 | reward 0.419 (correct 0.33) | loss +0.0012 | KL 0.0349 | clip 0.01 | |g| 0.33 | len 285 | 5844s
+step  27 | reward 0.222 (correct 0.16) | loss +0.0012 | KL 0.0240 | clip 0.01 | |g| 0.45 | len 354 | 6061s
+step  28 | reward 0.548 (correct 0.45) | loss +0.0012 | KL 0.0304 | clip 0.01 | |g| 0.31 | len 286 | 6278s
+step  29 | reward 0.317 (correct 0.25) | loss +0.0017 | KL 0.0474 | clip 0.01 | |g| 1.13 | len 369 | 6496s
+  (checkpoint -> checkpoints/overfit)
+
+Done. 30 steps in 6498s. Log -> results/overfit_log.json
+Adapter saved -> checkpoints/overfit
+mean reward: first3=0.327 -> last3=0.363 (delta +0.035)
