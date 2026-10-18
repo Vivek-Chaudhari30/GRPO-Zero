@@ -1,38 +1,56 @@
 # GRPO-Zero
 
-A **from-scratch implementation of GRPO** (Group Relative Policy Optimization) used to train a small open LLM (Qwen2.5-0.5B/1.5B-Instruct) on grade-school math (GSM8K) with a **verifiable reward** (RLVR — RL from Verifiable Rewards). The point is the update loop is implemented by hand — rollout, group-relative advantages, a PPO-style clipped objective, and a KL penalty to a frozen reference — not delegated to a library trainer. (Hugging Face TRL is used only to cross-check the math.)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)]()
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c)]()
+[![License: MIT](https://img.shields.io/badge/code-MIT-informational)]()
+[![Tests](https://img.shields.io/badge/tests-53%20passing-brightgreen)](tests/)
 
-**Goal:** reproduce the core finding that *RL against a verifiable reward measurably improves reasoning accuracy* — reported as a real baseline→trained pass@1 delta on the GSM8K test set.
+A **from-scratch implementation of GRPO** (Group Relative Policy Optimization) that trains a small open LLM (Qwen2.5-0.5B/1.5B-Instruct) on grade-school math (GSM8K) with a **verifiable reward** (RLVR — RL from Verifiable Rewards). No learned reward model, no critic network, no library trainer: the entire update loop — rollout, group-relative advantages, a PPO-style clipped objective, and a KL penalty to a frozen reference — is implemented by hand. (Hugging Face TRL is used only to cross-check the math.)
+
+**Goal:** reproduce the core RLVR finding that *RL against a deterministic verifier measurably improves reasoning accuracy*, reported as a real baseline → trained pass@1 delta on the GSM8K test set.
 
 ## Why this is interesting
 
-In RLVR there is **no learned reward model**. The reward is a deterministic program that checks whether the model's final answer is correct. GRPO then replaces PPO's value/critic network with a **group baseline**: for each prompt you sample a group of G completions, score them, and normalize the rewards *within the group* to get advantages. No critic → simpler and more memory-efficient, which is why it's the workhorse for verifiable-reward reasoning training.
+In RLVR there is **no learned reward model**. The reward is a deterministic program that checks whether the model's final answer is correct. GRPO then replaces PPO's value/critic network with a **group baseline**: for each prompt you sample a group of \(G\) completions, score them, and normalize the rewards *within the group* to get advantages. No critic → simpler and more memory-efficient, which is why GRPO is the workhorse of verifiable-reward reasoning training (DeepSeek-R1 and successors).
+
+```
+GSM8K prompt ──▶ sample G completions ──▶ verifier scores each (0/1 + format bonus)
+                        │
+                        ▼
+        group-relative advantage A_i = (r_i − mean) / (std + ε)      (no critic)
+                        │
+                        ▼
+     clipped PPO-style policy update  +  KL penalty to frozen reference (k3 estimator)
+                        │
+                        ▼
+              LoRA adapter update (bf16, grad checkpointing, resumable)
+```
 
 ## The GRPO update (what's implemented in [`src/grpo.py`](src/grpo.py))
 
-For each prompt, sample a group of $G$ completions $\{o_1,\dots,o_G\}$ and score each with the verifier to get rewards $r_i$.
+For each prompt, sample a group of \(G\) completions \(\{o_1,\dots,o_G\}\) and score each with the verifier to get rewards \(r_i\).
 
 **1. Group-relative advantage** (the baseline is the group mean; no critic):
 
 $$A_i = \frac{r_i - \mathrm{mean}(r_{1:G})}{\mathrm{std}(r_{1:G}) + \varepsilon}$$
 
-Every token in completion $i$ gets the same advantage $A_i$. A group with identical rewards has $A_i\approx 0$ — nothing to learn from that prompt this step.
+Every token in completion \(i\) gets the same advantage \(A_i\). A group with identical rewards has \(A_i\approx 0\) — nothing to learn from that prompt this step.
 
-**2. PPO-style clipped policy loss**, with $\rho_t = \exp(\log\pi_\theta(o_t) - \log\pi_{\theta_\text{old}}(o_t))$:
+**2. PPO-style clipped policy loss**, with \(\rho_t = \exp(\log\pi_\theta(o_t) - \log\pi_{\theta_\text{old}}(o_t))\):
 
 $$\mathcal{L}^\text{pol} = -\frac{1}{G}\sum_i \frac{1}{|o_i|}\sum_t \min\big(\rho_t A_i,\ \mathrm{clip}(\rho_t, 1-\epsilon, 1+\epsilon)\,A_i\big)$$
 
-**3. KL penalty to a frozen reference** (unbiased low-variance "k3" estimator, always $\ge 0$):
+**3. KL penalty to a frozen reference** (unbiased low-variance "k3" estimator, always \(\ge 0\)):
 
 $$\mathbb{D}_\text{KL}\big[\pi_\theta \,\|\, \pi_\text{ref}\big]_t = \exp(\log\pi_\text{ref}(o_t) - \log\pi_\theta(o_t)) - (\log\pi_\text{ref}(o_t) - \log\pi_\theta(o_t)) - 1$$
 
-**Total:** $\mathcal{L} = \mathcal{L}^\text{pol} + \beta\,\mathbb{D}_\text{KL}$, averaged per-sequence then over the batch.
+**Total:** \(\mathcal{L} = \mathcal{L}^\text{pol} + \beta\,\mathbb{D}_\text{KL}\), averaged per-sequence then over the batch.
 
-Memory levers: **LoRA** policy (the frozen reference is the *same* model with the adapter disabled — no second copy), bf16, gradient checkpointing, micro-batched log-prob/grad passes, capped completion length.
+**Memory levers:** LoRA policy with the frozen reference implemented as the *same* model with the adapter disabled (no second copy in memory), bf16, gradient checkpointing, micro-batched log-prob/grad passes, capped completion length, and **resumable checkpoints** so a run survives Colab GPU-quota disconnects.
 
 ## Verifier (the reward) — [`src/verifier.py`](src/verifier.py)
 
-Deterministic, unit-tested. Extracts the final answer (number after the last `####`, else inside `\boxed{}`, else last number as a fallback), normalizes it (commas, `$`, `%`, signs, decimals, fractions), and compares to gold:
+Deterministic and unit-tested. Extracts the final answer (number after the last `####`, else inside `\boxed{}`, else last number as a fallback), normalizes it (commas, `$`, `%`, signs, decimals, fractions), and compares to gold:
 
 ```
 reward = 1.0 if correct else 0.0   +   0.1 if answer emitted in #### / \boxed{} format
@@ -42,13 +60,13 @@ The format bonus is independent of correctness, so it shapes output style withou
 
 ## Results
 
-| | model | metric | n | accuracy |
-|---|---|---|---|---|
-| **Baseline** (no training) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 100 (test subset, MPS) | **0.47** |
-| Baseline (full set) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 1319 (GPU) | _pending full GPU run_ |
-| **GRPO-trained** | + LoRA adapter | pass@1 (greedy) | 1319 (GPU) | _pending full GPU run_ |
+Measured baseline (greedy pass@1 on a 100-problem GSM8K test subset, Qwen2.5-0.5B-Instruct, Apple MPS):
 
-The full-test-set baseline and trained numbers, the reward curve, and before/after sample completions are produced by the Colab run below and filled in here with the **real measured values** — no placeholders.
+| Setting | Model | Metric | n | Accuracy |
+|---|---|---|---|---|
+| Baseline (untrained) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 100 | **0.47** |
+
+This is the subset baseline recorded in [`results/metrics.json`](results/metrics.json); the committed artifacts do not yet include trained-policy metrics or a full-test-set comparison. The full pipeline — full-set baseline, GRPO training run, and trained-policy eval — is executed end-to-end by the Colab notebook below, and the trained numbers land here as **real measured values, never placeholders**.
 
 ## Run it
 
@@ -61,7 +79,9 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 
 **Training (CUDA GPU — Colab):** open [`notebooks/colab_train.ipynb`](notebooks/colab_train.ipynb) (set Runtime → GPU). It clones the repo, runs the unit tests, the overfit sanity check, the full-set baseline, the GRPO training run, and the trained-policy eval, then plots the curves.
 
-Everything is config-driven via [`configs/grpo_gsm8k.yaml`](configs/grpo_gsm8k.yaml); the code autodetects `cuda → mps → cpu`.
+**Analysis (before/after + curves):** [`notebooks/analysis.ipynb`](notebooks/analysis.ipynb) reads `results/` and shows the baseline-vs-trained delta, the reward/KL curve, and problems the trained policy fixed.
+
+Everything is config-driven via [`configs/grpo_gsm8k.yaml`](configs/grpo_gsm8k.yaml); the code autodetects `cuda → mps → cpu`. Training is resumable: pass `--resume` to continue from `checkpoints/…/training_state.pt` after a disconnect.
 
 ## Repo layout
 
@@ -69,11 +89,12 @@ Everything is config-driven via [`configs/grpo_gsm8k.yaml`](configs/grpo_gsm8k.y
 src/verifier.py   RLVR reward: answer extraction + scoring (unit-tested)
 src/data.py       GSM8K loader + Qwen2.5 chat prompt template
 src/grpo.py       rollout, group advantages, per-token logprobs, clipped loss + KL, train step
-src/train.py      training loop + reward/KL logging + LoRA checkpointing
+src/train.py      training loop + reward/KL logging + resumable LoRA checkpointing
 src/eval.py       pass@1 / pass@k, base model or trained adapter
 configs/          grpo_gsm8k.yaml
-tests/            verifier + GRPO-math unit tests (model-free)
+tests/            verifier + GRPO-math unit tests (model-free, 53 tests)
 notebooks/        colab_train.ipynb (end-to-end on a GPU), analysis.ipynb (before/after + curves)
+results/          measured metrics + completions (committed as they are produced)
 ```
 
 ## References
