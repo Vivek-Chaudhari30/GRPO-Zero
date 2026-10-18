@@ -2,7 +2,6 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)]()
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c)]()
-[![License: MIT](https://img.shields.io/badge/code-MIT-informational)]()
 [![Tests](https://img.shields.io/badge/tests-53%20passing-brightgreen)](tests/)
 
 A **from-scratch implementation of GRPO** (Group Relative Policy Optimization) that trains a small open LLM (Qwen2.5-0.5B/1.5B-Instruct) on grade-school math (GSM8K) with a **verifiable reward** (RLVR — RL from Verifiable Rewards). No learned reward model, no critic network, no library trainer: the entire update loop — rollout, group-relative advantages, a PPO-style clipped objective, and a KL penalty to a frozen reference — is implemented by hand. (Hugging Face TRL is used only to cross-check the math.)
