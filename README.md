@@ -1,16 +1,16 @@
 # GRPO-Zero
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)]()
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c)]()
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.2%2B-ee4c2c)
 [![Tests](https://img.shields.io/badge/tests-53%20passing-brightgreen)](tests/)
 
 A **from-scratch implementation of GRPO** (Group Relative Policy Optimization) that trains a small open LLM (Qwen2.5-0.5B/1.5B-Instruct) on grade-school math (GSM8K) with a **verifiable reward** (RLVR — RL from Verifiable Rewards). No learned reward model, no critic network, no library trainer: the entire update loop — rollout, group-relative advantages, a PPO-style clipped objective, and a KL penalty to a frozen reference — is implemented by hand. (Hugging Face TRL is used only to cross-check the math.)
 
-**Goal:** reproduce the core RLVR finding that *RL against a deterministic verifier measurably improves reasoning accuracy*, reported as a real baseline → trained pass@1 delta on the GSM8K test set.
+**Goal:** reproduce the core RLVR finding that **RL against a deterministic verifier measurably improves reasoning accuracy**, reported as a real baseline → trained pass@1 delta on the GSM8K test set.
 
 ## Why this is interesting
 
-In RLVR there is **no learned reward model**. The reward is a deterministic program that checks whether the model's final answer is correct. GRPO then replaces PPO's value/critic network with a **group baseline**: for each prompt you sample a group of \(G\) completions, score them, and normalize the rewards *within the group* to get advantages. No critic → simpler and more memory-efficient, which is why GRPO is the workhorse of verifiable-reward reasoning training (DeepSeek-R1 and successors).
+In RLVR there is **no learned reward model**. The reward is a deterministic program that checks whether the model's final answer is correct. GRPO then replaces PPO's value/critic network with a **group baseline**: for each prompt you sample a group of \(G\) completions, score them, and normalize the rewards within the group to get advantages. No critic → simpler and more memory-efficient, which is why GRPO is the workhorse of verifiable-reward reasoning training (DeepSeek-R1 and successors).
 
 ```
 GSM8K prompt ──▶ sample G completions ──▶ verifier scores each (0/1 + format bonus)
@@ -31,21 +31,27 @@ For each prompt, sample a group of \(G\) completions \(\{o_1,\dots,o_G\}\) and s
 
 **1. Group-relative advantage** (the baseline is the group mean; no critic):
 
-$$A_i = \frac{r_i - \mathrm{mean}(r_{1:G})}{\mathrm{std}(r_{1:G}) + \varepsilon}$$
+```text
+A_i = (r_i - mean(r)) / (std(r) + eps)
+```
 
 Every token in completion \(i\) gets the same advantage \(A_i\). A group with identical rewards has \(A_i\approx 0\) — nothing to learn from that prompt this step.
 
-**2. PPO-style clipped policy loss**, with \(\rho_t = \exp(\log\pi_\theta(o_t) - \log\pi_{\theta_\text{old}}(o_t))\):
+**2. PPO-style clipped policy loss**, with `rho_t = exp(logpi_theta(o_t) - logpi_theta_old(o_t))`:
 
-$$\mathcal{L}^\text{pol} = -\frac{1}{G}\sum_i \frac{1}{|o_i|}\sum_t \min\big(\rho_t A_i,\ \mathrm{clip}(\rho_t, 1-\epsilon, 1+\epsilon)\,A_i\big)$$
+```text
+L_pol = -(1/G) Σ_i (1/|o_i|) Σ_t min( rho_t·A_i , clip(rho_t, 1-ε, 1+ε)·A_i )
+```
 
-**3. KL penalty to a frozen reference** (unbiased low-variance "k3" estimator, always \(\ge 0\)):
+**3. KL penalty to a frozen reference** (unbiased low-variance "k3" estimator, always non-negative):
 
-$$\mathbb{D}_\text{KL}\big[\pi_\theta \,\|\, \pi_\text{ref}\big]_t = \exp(\log\pi_\text{ref}(o_t) - \log\pi_\theta(o_t)) - (\log\pi_\text{ref}(o_t) - \log\pi_\theta(o_t)) - 1$$
+```text
+KL_t = exp(logpi_ref(o_t) - logpi_theta(o_t)) - (logpi_ref(o_t) - logpi_theta(o_t)) - 1
+```
 
-**Total:** \(\mathcal{L} = \mathcal{L}^\text{pol} + \beta\,\mathbb{D}_\text{KL}\), averaged per-sequence then over the batch.
+**Total:** `L = L_pol + β·KL`, averaged per-sequence then over the batch.
 
-**Memory levers:** LoRA policy with the frozen reference implemented as the *same* model with the adapter disabled (no second copy in memory), bf16, gradient checkpointing, micro-batched log-prob/grad passes, capped completion length, and **resumable checkpoints** so a run survives Colab GPU-quota disconnects.
+**Memory levers:** LoRA policy with the frozen reference implemented as the same model with the adapter disabled (no second copy in memory), bf16, gradient checkpointing, micro-batched log-prob/grad passes, capped completion length, and **resumable checkpoints** so a run survives Colab GPU-quota disconnects.
 
 ## Verifier (the reward) — [`src/verifier.py`](src/verifier.py)
 
