@@ -1,6 +1,6 @@
 # GRPO-Zero
 
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Python](https://img.shields.io/badge/python-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.2%2B-ee4c2c)
 [![Tests](https://img.shields.io/badge/tests-53%20passing-brightgreen)](tests/)
 
