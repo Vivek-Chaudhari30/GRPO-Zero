@@ -100,7 +100,7 @@ The share of correct rollouts rose from about 25% (first 20 steps) to about 46% 
 Same question, same greedy decoding, taken straight from [`results/baseline_completions_full.json`](results/baseline_completions_full.json) and [`results/trained_completions.json`](results/trained_completions.json).
 
 <details>
-<summary><b>Example 1: punches per fight (test problem #516)</b> (gold answer: 375)</summary>
+<summary><b>Example 1: punches per fight (GSM8K test index 516)</b> (gold answer: 375)</summary>
 
 **Question:** On average Joe throws 25 punches per minute.  A fight lasts 5 rounds of 3 minutes.  How many punches did he throw?
 
@@ -134,7 +134,7 @@ So, the total number of punches Joe threw is \( \boxed{375} \).
 </details>
 
 <details>
-<summary><b>Example 2: arm wrestling (test problem #305)</b> (gold answer: 4)</summary>
+<summary><b>Example 2: arm wrestling (GSM8K test index 305)</b> (gold answer: 4)</summary>
 
 **Question:** John arm wrestles 20 people.  He beats 80%.  How many people did he lose to?
 
