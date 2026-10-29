@@ -3,10 +3,13 @@
 ![Python](https://img.shields.io/badge/python-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.2%2B-ee4c2c)
 [![Tests](https://img.shields.io/badge/tests-53%20passing-brightgreen)](tests/)
+[![GSM8K pass@1](https://img.shields.io/badge/GSM8K%20pass%401-47.2%25%20(%2B4.4)-blue)](results/RUN_2026-10-29.md)
 
 A **from-scratch implementation of GRPO** (Group Relative Policy Optimization) that trains a small open LLM (Qwen2.5-0.5B/1.5B-Instruct) on grade-school math (GSM8K) with a **verifiable reward** (RLVR — RL from Verifiable Rewards). No learned reward model, no critic network, no library trainer: the entire update loop — rollout, group-relative advantages, a PPO-style clipped objective, and a KL penalty to a frozen reference — is implemented by hand. (Hugging Face TRL is used only to cross-check the math.)
 
 **Goal:** reproduce the core RLVR finding that **RL against a deterministic verifier measurably improves reasoning accuracy**, reported as a real baseline → trained pass@1 delta on the GSM8K test set.
+
+> **Status: full run complete (2026-10-29).** GRPO with LoRA (200 steps, 1x RTX A6000) lifted Qwen2.5-0.5B-Instruct from **42.76% to 47.16% pass@1 on the full GSM8K test set (n=1319), +4.4 points**. See [Results](#results) and the raw run artifacts in [`results/`](results/).
 
 ## Why this is interesting
 
@@ -101,7 +104,7 @@ src/eval.py       pass@1 / pass@k, base model or trained adapter
 configs/          grpo_gsm8k.yaml
 tests/            verifier + GRPO-math unit tests (model-free, 53 tests)
 notebooks/        colab_train.ipynb (end-to-end on a GPU), analysis.ipynb (before/after + curves)
-results/          measured metrics + completions (committed as they are produced)
+results/          measured metrics, completions, train/eval logs and screenshots from the 2026-10-29 run
 ```
 
 ## References
