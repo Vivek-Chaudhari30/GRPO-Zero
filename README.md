@@ -65,13 +65,15 @@ The format bonus is independent of correctness, so it shapes output style withou
 
 ## Results
 
-Measured baseline (greedy pass@1 on a 100-problem GSM8K test subset, Qwen2.5-0.5B-Instruct, Apple MPS):
+First full run (2026-10-29, 1x RTX A6000, 200 GRPO steps, LoRA, lr 1e-5). Greedy pass@1 on the **full GSM8K test set** (n=1319), same model and verifier for both rows:
 
 | Setting | Model | Metric | n | Accuracy |
 |---|---|---|---|---|
-| Baseline (untrained) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 100 | **0.47** |
+| Baseline (untrained) | Qwen2.5-0.5B-Instruct | pass@1 (greedy) | 1319 | **0.4276** (564/1319) |
+| GRPO-trained (LoRA) | Qwen2.5-0.5B-Instruct + LoRA | pass@1 (greedy) | 1319 | **0.4716** (622/1319) |
+| **Delta** | | | | **+4.4 pts** |
 
-This is the subset baseline recorded in [`results/metrics.json`](results/metrics.json); the committed artifacts do not yet include trained-policy metrics or a full-test-set comparison. The full pipeline — full-set baseline, GRPO training run, and trained-policy eval — is executed end-to-end by the Colab notebook below, and the trained numbers land here as **real measured values, never placeholders**.
+Full write-up, setup, commands and screenshots: [`results/RUN_2026-10-29.md`](results/RUN_2026-10-29.md). Raw numbers: [`results/metrics.json`](results/metrics.json) (`baseline_full` vs `trained`; the older `baseline` entry is a 100-problem Mac subset and is not comparable).
 
 ## Run it
 
